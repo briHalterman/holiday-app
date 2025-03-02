@@ -9,7 +9,15 @@ const [year, month, day] = date.split('-');
 // Require https module
 const https = require('https');
 
+const fs = require('fs');
+
+const countryCodes = JSON.parse(
+  fs.readFileSync('country-codes.json', 'utf-8')
+);
+
 function getHolidays(countryCode) {
+  const countryName = countryCodes[countryCode];
+
   try {
     // Request data
     const request = https.get(
@@ -27,7 +35,9 @@ function getHolidays(countryCode) {
             const holidays = JSON.parse(body);
 
             if (!holidays.length) {
-              console.log('Today is not a holiday.');
+              console.log(
+                'Today is not a holiday in ${countryName}.'
+              );
               return;
             }
 
@@ -35,7 +45,9 @@ function getHolidays(countryCode) {
               .map((holiday) => holiday.name)
               .join(', ');
             // Print data
-            console.log(`Today is ${holidayNames}.`);
+            console.log(
+              `Today is ${holidayNames} in ${countryName}.`
+            );
           } catch (error) {
             console.error(error.message);
           }
