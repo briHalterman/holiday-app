@@ -2,9 +2,8 @@
 require('dotenv').config();
 
 const apiKey = process.env.API_KEY;
-// console.log(apiKey);
 
-const date = '2025-12-25';
+const date = new Date().toISOString().slice(0, 10);
 const [year, month, day] = date.split('-');
 
 // Require https module
@@ -23,10 +22,23 @@ function getHolidays(countryCode) {
         });
 
         response.on('end', () => {
-          // Parse data
-          const holidays = JSON.parse(body);
-          // Print data
-          console.log(holidays);
+          try {
+            // Parse data
+            const holidays = JSON.parse(body);
+
+            if (!holidays.length) {
+              console.log('Today is not a holiday.');
+              return;
+            }
+
+            const holidayNames = holidays
+              .map((holiday) => holiday.name)
+              .join(', ');
+            // Print data
+            console.log(`Today is ${holidayNames}.`);
+          } catch (error) {
+            console.error(error.message);
+          }
         });
       }
     );
